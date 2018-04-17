@@ -14,7 +14,15 @@ contract RandomFail {
         require(msg.value == 0);
     }
 
-    function purchaseTicket() public payable {
+    function purchaseTicket() public payable returns (address[]) {
+        require(msg.value > TICKET_PRICE);
+        uint256 refund = msg.value - TICKET_PRICE;
+        if (refund > 0) {
+            msg.sender.transfer(refund);
+        }
+        players.push(msg.sender);
+        return players;
+    }
 
     }
 
