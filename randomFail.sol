@@ -3,11 +3,17 @@ pragma solidity ^0.4.21;
 
 contract RandomFail {
 
+    address private host;
     address[] public players;
     uint constant public TICKET_PRICE = 0.01 ether;
 
     function RandomFail() public {
-
+        host = msg.sender;
+    }
+    
+    modifier onlyHost() {
+        require(msg.sender == host);
+        _;
     }
 
     function () public payable {
