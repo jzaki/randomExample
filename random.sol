@@ -31,4 +31,25 @@ contract Random {
         players.push(msg.sender);
         return players;
     }
+    
+    event Winner(address winner);
+    
+    function determineWinner(bytes32 _randomSeedHash) public onlyHost {
+        closed = true;
+        hashedSeed = _randomSeedHash;
+        blockNumberToUse = block.number+1;
+    }
+
+    function declareWinner(bytes32 _randomSeed) public onlyHost returns (address winner) {
+        require(hashedSeed == keccak256(_randomSeed));
+        hashedSeed = "";
+        bytes32 blockHash = block.blockhash(blockNumberToUse);
+        uint random = uint(keccak256(uint(_randomSeed) + uint(blockHash)));
+        uint winnerIndex = random % players.length;
+        winner = players[winnerIndex];
+        players.length = 0;
+        closed = false;
+        emit Winner(winner);
+        winner.transfer(address(this).balance);
+    }
 }
