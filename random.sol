@@ -38,12 +38,14 @@ contract Random {
     event Winner(address winner);
     
     function determineWinner(bytes32 _randomSeedHash) public onlyHost {
+        require(!closed);
         closed = true;
         hashedSeed = _randomSeedHash;
         blockNumberToUse = block.number+1;
     }
 
     function declareWinner(bytes32 _randomSeed) public onlyHost returns (address winner) {
+        require(closed);
         require(hashedSeed == keccak256(_randomSeed));
         hashedSeed = "";
         bytes32 blockHash = block.blockhash(blockNumberToUse);
